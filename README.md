@@ -7,15 +7,14 @@
 2. 필요사항
 3. 필요한 툴과 패키지들
 4. 프로젝트 세팅
-5. MongoDB Database 세팅
-6. User Model 설정
-7. User Signup
-8. User Login
-9. 로그인된 User 정보 가져오기
-10. 마치며
+5. MongoDB 데이터베이스와 User Model 설정
+6. User Signup
+7. User Login
+8. 로그인된 User 정보 가져오기
+9. 마치며
 
 ## 1. 소개
-**인증(Authentication)** - 사용자의 일치를 확인하는 과정
+**인증(Authentication)** - 사용자의 일치를 확인하는 과정<br>
 **인가(Authorization)** - 허가된 작업인지를 확인후 권한부여
 
 ## 2. 필요사항
@@ -42,24 +41,85 @@ MongoDB Ojbect modeling 툴로써 비동기 환경이며, promise와 callbacks �
 
 
 ## 4. 프로젝트 세팅
-$ npm init -y
+$ npm init -y<br>
 $ npm install express express-validator body-parser bcryptjs jsonwebtoken mongoose --save
 
 ```js
-const express = require("express");
-const bodyParser = require("body-parser");
+// index.js
+const express = require('express');
 
 const app = express();
 
 // PORT
 const PORT = process.env.PORT || 4000;
 
-app.get("/", (req, res) => {
-  res.json({ message: "API Working" });
+app.get('/', (req, res) => {
+  res.json({ message: 'API Working' });
 });
 
 
 app.listen(PORT, (req, res) => {
   console.log(`Server Started at PORT ${PORT}`);
 });
+```
+
+## 5. MongoDB 데이터베이스와 User Model 설정
+[MongoDB](https://www.mongodb.com/3)
+[MongoDB Doc](https://docs.mongodb.com/manual/)
+
+1. 데이터베이스 생성
+Clusters-Create Database : users collection 생성
+
+2. 데이터베이스 연결 정보 가져오기 
+Clusters-CONNECT-Connect Your application
+`mongodb+srv://devPark:<password>@react-boiler-plate.ovbtd.mongodb.net/<dbname>?retryWrites=true&w=majority`
+
+3. User Model 설정
+```js
+// config/db.js
+const mongoose = require('mongoose');
+
+const MongoServer = async () => {
+    try {
+        await mongoose.connect(MongoURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: false,
+            useCreateIndex: true
+        });
+        console.log('Connected to MongoDB !!');
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+};
+
+module.exports = MongoServer;
+```
+
+4. User Model 생성
+```js
+// models/User.js
+const mongoose = require('mongoose');
+
+const UserSchema = mongoose.Schema({
+    username: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    createAt: {
+        type: Date,
+        default: Date.now()
+    }
+});
+
+module.exports = mongoose.model('User', UserSchema);
 ```

@@ -1,13 +1,15 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const MongoServer = require('./config/db');
+
+MongoServer();
 
 const app = express();
 
 // PORT
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
-    res.json({ message: "API working" });
+    res.json({ message: 'API working' });
 });
 
 app.listen(PORT, (req, res) => {
