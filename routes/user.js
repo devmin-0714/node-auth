@@ -3,6 +3,7 @@ const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
+const auth = require("../middleware/auth");
 
 const User = require("../model/User");
 
@@ -57,7 +58,7 @@ router.post(
         },
       };
 
-      jwt.sign(payload, "randommString", { expiresIn: 10000 }, (err, token) => {
+      jwt.sign(payload, "secret", { expiresIn: 10000 }, (err, token) => {
         if (err) throw err;
         res.status(200).json({
           token,
@@ -106,7 +107,7 @@ router.post(
         },
       };
 
-      jwt.sign(payload, "randomString", { expiresIn: 3600 }, (err, token) => {
+      jwt.sign(payload, "secret", { expiresIn: 3600 }, (err, token) => {
         if (err) throw err;
         res.status(200).json({ token });
       });
@@ -118,5 +119,21 @@ router.post(
     }
   }
 );
+
+/**
+ * @method - GET
+ * @description - Get LoggedIn User
+ * @param - /user/me
+ */
+
+router.get("/me", auth, async (req, res) => {
+  try {
+    // 미들웨어애서 토큰 인증을 하면 req.user를 가져올수있다.
+    const user = await User.findById(req.user.id);
+    res.json(user);
+  } catch (e) {
+    res.send({ message: "유저정보를 가져오는데 실패했습니다." });
+  }
+});
 
 module.exports = router;
